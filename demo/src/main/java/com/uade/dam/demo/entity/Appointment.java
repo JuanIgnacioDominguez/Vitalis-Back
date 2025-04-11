@@ -12,7 +12,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Turnos {
+public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class Turnos {
 
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)
-    private Usuario paciente;
+    private User paciente;
 
     @ManyToOne
     @JoinColumn(name = "id_profesional", nullable = false)
