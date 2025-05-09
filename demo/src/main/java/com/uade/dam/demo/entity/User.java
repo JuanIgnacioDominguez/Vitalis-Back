@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
-import com.uade.dam.demo.entity.ObraSocial;
-import com.uade.dam.demo.entity.HistorialMedico;
+
 
 @Data
 @Builder

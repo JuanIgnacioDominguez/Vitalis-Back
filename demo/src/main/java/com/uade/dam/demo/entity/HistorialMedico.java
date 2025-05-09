@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "turnos")
-public class Appointment {
+@Table(name = "historial_medico")
+public class HistorialMedico {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,13 +19,13 @@ public class Appointment {
     @JoinColumn(name = "id_paciente", nullable = false)
     private User paciente;
 
-    @ManyToOne
-    @JoinColumn(name = "id_profesional", nullable = false)
-    private Profesional profesional;
-
     @Column(nullable = false)
     private LocalDateTime fecha;
 
-    @Column(nullable = false)
-    private String estado;
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
+
+    @ManyToOne
+    @JoinColumn(name = "id_profesional")
+    private Profesional profesional;
 }
