@@ -8,13 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Appointment {
+public class Favorite {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String userId;
     private String professionalId;
-    private String date;
-    private String time;
-    private String status; // pending, completed, canceled
 }

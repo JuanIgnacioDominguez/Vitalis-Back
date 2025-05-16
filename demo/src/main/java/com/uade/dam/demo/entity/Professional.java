@@ -2,19 +2,18 @@ package com.uade.dam.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Appointment {
+public class Professional {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String userId;
-    private String professionalId;
-    private String date;
-    private String time;
-    private String status; // pending, completed, canceled
+    private String name;
+    private String specialty;
+    // Puedes agregar horariosDisponibles como JSON o entidad aparte
 }

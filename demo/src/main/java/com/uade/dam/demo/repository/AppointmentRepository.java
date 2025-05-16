@@ -2,7 +2,9 @@ package com.uade.dam.demo.repository;
 
 import com.uade.dam.demo.entity.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
-@Repository
-public interface AppointmentRepository extends JpaRepository<Appointment, Long> {}
+public interface AppointmentRepository extends JpaRepository<Appointment, String> {
+    List<Appointment> findByUserId(String userId);
+    List<Appointment> findByUserIdAndStatus(String userId, String status);
+}

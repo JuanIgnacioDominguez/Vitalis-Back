@@ -2,7 +2,6 @@ package com.uade.dam.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,16 +9,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-
-    private String nombre;
-    @Column(unique = true)
-    private String email;
-    private String password;
-    private String telefono;
-    private String obraSocial;
-    private LocalDateTime fechaRegistro;
+    private String userId;
+    private String message;
+    private String type;
+    private boolean read;
+    private LocalDateTime date;
 }
