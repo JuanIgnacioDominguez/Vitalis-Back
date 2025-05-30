@@ -63,24 +63,19 @@ public class ProfessionalController {
             return null;
         }).filter(Objects::nonNull).toList();
 
-        // Si hay menos de 'limit', completa con aleatorios
         if (result.size() < limit) {
-            // Obtén IDs ya usados
             List<String> usedIds = result.stream().map(TopFavoriteDTO::getId).toList();
-            // Busca profesionales que no estén en la lista
             List<Professional> others = professionalRepository.findAll().stream()
                 .filter(p -> !usedIds.contains(p.getId()))
                 .collect(java.util.stream.Collectors.toList());
-            // Mezcla aleatoriamente
             java.util.Collections.shuffle(others);
-            // Agrega hasta completar el límite
             for (Professional p : others) {
                 if (result.size() >= limit) break;
                 result.add(new TopFavoriteDTO(
                     p.getId(),
                     p.getName(),
                     p.getSpecialty(),
-                    0L // No tiene favoritos
+                    0L 
                 ));
             }
         }
