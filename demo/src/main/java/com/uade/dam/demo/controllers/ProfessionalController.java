@@ -1,19 +1,29 @@
 package com.uade.dam.demo.controllers;
 
+import com.uade.dam.demo.dto.TopFavoriteDTO;
 import com.uade.dam.demo.entity.Professional;
+import com.uade.dam.demo.repository.FavoriteRepository;
+import com.uade.dam.demo.repository.ProfessionalRepository;
 import com.uade.dam.demo.service.ProfessionalService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/professionals")
 public class ProfessionalController {
 
     private final ProfessionalService professionalService;
+    private final FavoriteRepository favoriteRepository;
+    private final ProfessionalRepository professionalRepository;
 
-    public ProfessionalController(ProfessionalService professionalService) {
+    public ProfessionalController(ProfessionalService professionalService, FavoriteRepository favoriteRepository, ProfessionalRepository professionalRepository) {
         this.professionalService = professionalService;
+        this.favoriteRepository = favoriteRepository;
+        this.professionalRepository = professionalRepository;
     }
 
     @GetMapping
@@ -34,5 +44,24 @@ public class ProfessionalController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         professionalService.deleteById(id);
+    }
+
+    @GetMapping("/top-favorites")
+    public ResponseEntity<List<TopFavoriteDTO>> getTopFavoritedProfessionals(@RequestParam(defaultValue = "10") int limit) {
+        var topFavs = favoriteRepository.findTopFavoritedProfessionals(PageRequest.of(0, limit));
+        List<TopFavoriteDTO> result = topFavs.stream().map(fav -> {
+            var profOpt = professionalRepository.findById(fav.getProfessionalId());
+            if (profOpt.isPresent()) {
+                var prof = profOpt.get();
+                return new TopFavoriteDTO(
+                    prof.getId(),
+                    prof.getName(),
+                    prof.getSpecialty(),
+                    fav.getCount()
+                );
+            }
+            return null;
+        }).filter(Objects::nonNull).toList();
+        return ResponseEntity.ok(result);
     }
 }
