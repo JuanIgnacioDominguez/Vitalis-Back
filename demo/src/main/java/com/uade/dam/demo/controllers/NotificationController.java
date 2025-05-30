@@ -1,7 +1,7 @@
 package com.uade.dam.demo.controllers;
 
 import com.uade.dam.demo.entity.Notification;
-import com.uade.dam.demo.repository.NotificationRepository;
+import com.uade.dam.demo.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,13 +10,29 @@ import java.util.List;
 @RequestMapping("/notifications")
 public class NotificationController {
 
-    private final NotificationRepository notificationRepository;
-    public NotificationController(NotificationRepository notificationRepository) {
-        this.notificationRepository = notificationRepository;
+    private final NotificationService notificationService;
+
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @GetMapping
     public List<Notification> list() {
-        return notificationRepository.findByUserId("demo-user-id");
+        return notificationService.findByUserId("demo-user-id");
+    }
+
+    @GetMapping("/{id}")
+    public Notification get(@PathVariable String id) {
+        return notificationService.findById(id).orElse(null);
+    }
+
+    @PostMapping
+    public Notification create(@RequestBody Notification notification) {
+        return notificationService.save(notification);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        notificationService.deleteById(id);
     }
 }

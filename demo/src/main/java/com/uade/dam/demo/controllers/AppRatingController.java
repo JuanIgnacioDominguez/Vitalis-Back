@@ -1,30 +1,38 @@
 package com.uade.dam.demo.controllers;
 
-import com.uade.dam.demo.dto.AppRatingRequest;
 import com.uade.dam.demo.entity.AppRating;
-import com.uade.dam.demo.repository.AppRatingRepository;
-import org.springframework.http.ResponseEntity;
+import com.uade.dam.demo.service.AppRatingService;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/app-ratings")
 public class AppRatingController {
 
-    private final AppRatingRepository appRatingRepository;
-    public AppRatingController(AppRatingRepository appRatingRepository) {
-        this.appRatingRepository = appRatingRepository;
+    private final AppRatingService appRatingService;
+
+    public AppRatingController(AppRatingService appRatingService) {
+        this.appRatingService = appRatingService;
+    }
+
+    @GetMapping
+    public List<AppRating> list() {
+        return appRatingService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public AppRating get(@PathVariable String id) {
+        return appRatingService.findById(id).orElse(null);
     }
 
     @PostMapping
-    public ResponseEntity<?> rate(@RequestBody AppRatingRequest req) {
-        AppRating rating = AppRating.builder()
-                .score(req.getPuntuacion())
-                .comment(req.getComentario())
-                .date(LocalDateTime.now())
-                .build();
-        appRatingRepository.save(rating);
-        return ResponseEntity.status(201).body(rating);
+    public AppRating create(@RequestBody AppRating appRating) {
+        return appRatingService.save(appRating);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        appRatingService.deleteById(id);
     }
 }

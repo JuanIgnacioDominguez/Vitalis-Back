@@ -1,8 +1,7 @@
 package com.uade.dam.demo.controllers;
 
 import com.uade.dam.demo.entity.Professional;
-import com.uade.dam.demo.repository.ProfessionalRepository;
-import org.springframework.http.ResponseEntity;
+import com.uade.dam.demo.service.ProfessionalService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,33 +10,29 @@ import java.util.List;
 @RequestMapping("/professionals")
 public class ProfessionalController {
 
-    private final ProfessionalRepository professionalRepository;
+    private final ProfessionalService professionalService;
 
-    public ProfessionalController(ProfessionalRepository professionalRepository) {
-        this.professionalRepository = professionalRepository;
+    public ProfessionalController(ProfessionalService professionalService) {
+        this.professionalService = professionalService;
     }
 
     @GetMapping
-    public List<Professional> list(@RequestParam(required = false) String specialty) {
-        if (specialty != null) {
-            return professionalRepository.findBySpecialty(specialty);
-        }
-        return professionalRepository.findAll();
+    public List<Professional> list() {
+        return professionalService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> detail(@PathVariable String id) {
-        Professional professional = professionalRepository.findById(id)
-                .orElse(null);
-        if (professional == null) {
-            return ResponseEntity.status(404).body(new ErrorResponse("NOT_FOUND", "Professional not found"));
-        }
-        return ResponseEntity.ok(professional);
+    public Professional get(@PathVariable String id) {
+        return professionalService.findById(id).orElse(null);
     }
 
-    private static class ErrorResponse {
-        public String code;
-        public String message;
-        public ErrorResponse(String c, String m) { code = c; message = m; }
+    @PostMapping
+    public Professional create(@RequestBody Professional professional) {
+        return professionalService.save(professional);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        professionalService.deleteById(id);
     }
 }

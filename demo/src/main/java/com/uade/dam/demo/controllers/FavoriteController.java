@@ -1,11 +1,7 @@
 package com.uade.dam.demo.controllers;
 
-import com.uade.dam.demo.dto.FavoriteCreateRequest;
-import com.uade.dam.demo.dto.ErrorResponseDTO;
-import com.uade.dam.demo.dto.GenericSuccessDTO;
 import com.uade.dam.demo.entity.Favorite;
-import com.uade.dam.demo.repository.FavoriteRepository;
-import org.springframework.http.ResponseEntity;
+import com.uade.dam.demo.service.FavoriteService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,33 +10,29 @@ import java.util.List;
 @RequestMapping("/favorites")
 public class FavoriteController {
 
-    private final FavoriteRepository favoriteRepository;
-    public FavoriteController(FavoriteRepository favoriteRepository) {
-        this.favoriteRepository = favoriteRepository;
+    private final FavoriteService favoriteService;
+
+    public FavoriteController(FavoriteService favoriteService) {
+        this.favoriteService = favoriteService;
     }
 
     @GetMapping
     public List<Favorite> list() {
-        return favoriteRepository.findByUserId("demo-user-id");
+        return favoriteService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Favorite get(@PathVariable String id) {
+        return favoriteService.findById(id).orElse(null);
     }
 
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody FavoriteCreateRequest req) {
-        Favorite favorite = Favorite.builder()
-                .userId("demo-user-id")
-                .professionalId(req.getProfesionalId())
-                .build();
-        favoriteRepository.save(favorite);
-        return ResponseEntity.status(201).body(favorite);
+    public Favorite create(@RequestBody Favorite favorite) {
+        return favoriteService.save(favorite);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> remove(@PathVariable String id) {
-        if (!favoriteRepository.existsById(id)) {
-            return ResponseEntity.status(404).body(
-                    new ErrorResponseDTO("NOT_FOUND", "Favorite not found"));
-        }
-        favoriteRepository.deleteById(id);
-        return ResponseEntity.ok(new GenericSuccessDTO("Favorite removed"));
+    public void delete(@PathVariable String id) {
+        favoriteService.deleteById(id);
     }
 }
