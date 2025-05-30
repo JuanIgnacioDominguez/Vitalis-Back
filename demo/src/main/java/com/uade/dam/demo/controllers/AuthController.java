@@ -1,18 +1,24 @@
 package com.uade.dam.demo.controllers;
 
+import com.uade.dam.demo.dto.AuthRequestDTO;
 import com.uade.dam.demo.entity.User;
 import com.uade.dam.demo.repository.UserRepository;
 import com.uade.dam.demo.security.JwtUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.web.SecurityFilterChain;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -26,13 +32,14 @@ public class AuthController {
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody AuthRequest req) {
+    public ResponseEntity<?> register(@RequestBody AuthRequestDTO req) {
         if (usuarioRepository.findByEmail(req.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("mensaje", "Email ya registrado"));
         }
         User usuario = User.builder()
                 .email(req.getEmail())
-                .nombre(req.getEmail().split("@")[0])
+                .nombre(req.getNombre())
+                .telefono(req.getTelefono())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .fechaRegistro(LocalDateTime.now())
                 .build();
@@ -94,5 +101,7 @@ public class AuthController {
     public static class AuthRequest {
         private String email;
         private String password;
+        private String nombre;
+        private String telefono;
     }
 }
