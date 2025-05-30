@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
@@ -31,24 +34,40 @@ public class AuthController {
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequestDTO req) {
-        if (usuarioRepository.findByEmail(req.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body(Map.of("mensaje", "Email ya registrado"));
+        logger.info("Intentando registrar usuario con email: {}", req.getEmail());
+        try {
+            if (usuarioRepository.findByEmail(req.getEmail()).isPresent()) {
+                logger.warn("El email ya está registrado: {}", req.getEmail()); 
+                return ResponseEntity.badRequest().body(Map.of(
+                    "codigo", "EMAIL_EXISTS",
+                    "mensaje", "Email ya registrado"
+                ));
+            }
+            User usuario = User.builder()
+                    .email(req.getEmail())
+                    .nombre(req.getNombre())
+                    .telefono(req.getTelefono())
+                    .password(passwordEncoder.encode(req.getPassword()))
+                    .fechaRegistro(LocalDateTime.now())
+                    .build();
+            usuarioRepository.save(usuario);
+            String token = jwtUtil.generateToken(usuario.getId());
+            logger.info("Usuario registrado correctamente: {}", usuario.getEmail());
+            return ResponseEntity.status(201).body(Map.of(
+                    "token", token,
+                    "usuario", usuario
+            ));
+        } catch (Exception e) {
+            logger.error("Error al registrar usuario", e);
+            return ResponseEntity.status(500).body(Map.of(
+                "codigo", "INTERNAL_ERROR",
+                "mensaje", "Error interno del servidor"
+            ));
         }
-        User usuario = User.builder()
-                .email(req.getEmail())
-                .nombre(req.getNombre())
-                .telefono(req.getTelefono())
-                .password(passwordEncoder.encode(req.getPassword()))
-                .fechaRegistro(LocalDateTime.now())
-                .build();
-        usuarioRepository.save(usuario);
-        String token = jwtUtil.generateToken(usuario.getId());
-        return ResponseEntity.status(201).body(Map.of(
-                "token", token,
-                "usuario", usuario
-        ));
     }
 
     @PostMapping("/login")

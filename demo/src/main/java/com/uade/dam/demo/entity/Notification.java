@@ -16,6 +16,7 @@ public class Notification {
     private String userId;
     private String message;
     private String type;
-    private boolean read;
+    @Column(name = "is_read")
+    private boolean isRead;
     private LocalDateTime date;
 }

@@ -16,10 +16,16 @@ public class User {
     private String id;
 
     private String nombre;
+    
     @Column(unique = true)
     private String email;
+
     private String password;
+
     private String telefono;
+
+    @Column(nullable = true)
     private String obraSocial;
+
     private LocalDateTime fechaRegistro;
 }
