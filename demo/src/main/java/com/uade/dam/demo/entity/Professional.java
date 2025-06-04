@@ -2,7 +2,6 @@ package com.uade.dam.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.List;
 
 @Entity
 @Data

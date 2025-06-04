@@ -7,12 +7,8 @@ import com.uade.dam.demo.security.JwtUtil;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.web.SecurityFilterChain;
 
 import java.time.LocalDateTime;
 import java.util.Map;
