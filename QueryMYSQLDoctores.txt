@@ -1,0 +1,10 @@
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dr. Pablo Rivera', 'Pediatría');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dra. Carolina Soto', 'Psiquiatría');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dra. Fernanda Castillo', 'Ginecología');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dr. Javier Morales', 'Cardiología');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dr. Hugo Vargas', 'Traumatólogo');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dr. Rafael Gómez', 'Urólogo');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dra. Valeria Luna', 'Dermatólogo');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dr. Luis Peña', 'Pediatría');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dra. Sofía Méndez', 'Cardiología');
+INSERT INTO professional (id, imagen, name, specialty) VALUES (UUID(), NULL, 'Dr. Andrés Torres', 'Psiquiatría');

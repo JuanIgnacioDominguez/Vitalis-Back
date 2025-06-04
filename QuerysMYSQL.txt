@@ -1,0 +1,9 @@
+use vitalis
+
+select * from user
+select * from appointment
+select * from favorite
+select * from notification
+select * from professional
+select * from app_rating
+select * from time_slot
