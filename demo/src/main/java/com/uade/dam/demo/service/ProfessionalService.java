@@ -6,6 +6,8 @@ import com.uade.dam.demo.repository.ProfessionalRepository;
 import com.uade.dam.demo.repository.TimeSlotRepository;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +34,13 @@ public class ProfessionalService {
     }
 
     public Professional save(Professional professional) {
+        if (professional.getImagen() == null) {
+            try {
+                professional.setImagen(Files.readAllBytes(Paths.get("uploads/defaultUser.jpg")));
+            } catch (Exception e) {
+                professional.setImagen(null);
+            }
+        }
         Professional saved = professionalRepository.save(professional);
 
         List<TimeSlot> slots = new ArrayList<>();

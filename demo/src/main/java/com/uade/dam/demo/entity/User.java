@@ -28,4 +28,8 @@ public class User {
     private String obraSocial;
 
     private LocalDateTime fechaRegistro;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imagen;
 }

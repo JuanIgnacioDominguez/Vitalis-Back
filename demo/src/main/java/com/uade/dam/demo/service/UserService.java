@@ -4,6 +4,8 @@ import com.uade.dam.demo.entity.User;
 import com.uade.dam.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 @Service
@@ -18,6 +20,13 @@ public class UserService {
     }
 
     public User save(User user) {
+        if (user.getImagen() == null) {
+            try {
+                user.setImagen(Files.readAllBytes(Paths.get("uploads/defaultUser.jpg")));
+            } catch (Exception e) {
+                user.setImagen(null); 
+            }
+        }
         return userRepository.save(user);
     }
 

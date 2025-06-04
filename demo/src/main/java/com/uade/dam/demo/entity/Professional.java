@@ -15,4 +15,7 @@ public class Professional {
     private String name;
     private String specialty;
     // Puedes agregar horariosDisponibles como JSON o entidad aparte
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] imagen;
 }
