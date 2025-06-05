@@ -10,6 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.SimpleMailMessage;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Random;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
@@ -28,9 +33,15 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private JavaMailSender mailSender;
+
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+    // Guardar códigos en memoria (email -> código)
+    private Map<String, String> resetCodes = new ConcurrentHashMap<>();
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequestDTO req) {
@@ -83,25 +94,54 @@ public class AuthController {
     @PostMapping("/request-password-reset")
     public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> req) {
         String email = req.get("email");
+        logger.info("Recibida solicitud de recuperación para: {}", email);
+
         Optional<User> userOpt = usuarioRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
+            logger.warn("No se encontró usuario con email: {}", email);
             return ResponseEntity.status(404).body(Map.of("codigo", "NOT_FOUND", "mensaje", "User not found"));
         }
-        // Simula envío de código (en real, envía por email)
-        // Guarda el código en memoria o BD temporalmente
+        String code = String.format("%06d", new Random().nextInt(999999));
+        resetCodes.put(email, code);
+        logger.info("Código generado para {}: {}", email, code);
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Código de recuperación de contraseña");
+            message.setText("Tu código de recuperación es: " + code);
+            mailSender.send(message);
+            logger.info("Correo enviado a {}", email);
+        } catch (Exception e) {
+            logger.error("Error enviando correo a {}: {}", email, e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("message", "Error enviando correo"));
+        }
+
         return ResponseEntity.ok(Map.of("message", "Reset code sent"));
     }
 
     @PostMapping("/verify-reset-code")
     public ResponseEntity<?> verifyResetCode(@RequestBody Map<String, String> req) {
-        // Simula verificación de código
-        return ResponseEntity.ok(Map.of("message", "Code valid"));
+        String email = req.get("email");
+        String code = req.get("code");
+        String savedCode = resetCodes.get(email);
+        if (savedCode != null && savedCode.equals(code)) {
+            return ResponseEntity.ok(Map.of("message", "Code valid"));
+        }
+        return ResponseEntity.status(400).body(Map.of("message", "Invalid code"));
     }
 
     @PutMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> req) {
         String email = req.get("email");
         String newPassword = req.get("nueva");
+        String code = req.get("code");
+        String savedCode = resetCodes.get(email);
+
+        if (savedCode == null || !savedCode.equals(code)) {
+            return ResponseEntity.status(400).body(Map.of("message", "Invalid or missing code"));
+        }
+
         Optional<User> userOpt = usuarioRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("codigo", "NOT_FOUND", "mensaje", "User not found"));
@@ -109,6 +149,9 @@ public class AuthController {
         User user = userOpt.get();
         user.setPassword(passwordEncoder.encode(newPassword));
         usuarioRepository.save(user);
+
+        resetCodes.remove(email);
+
         return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
     }
 
