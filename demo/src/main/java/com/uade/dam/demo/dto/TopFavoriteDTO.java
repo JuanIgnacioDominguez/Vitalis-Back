@@ -1,5 +1,6 @@
 package com.uade.dam.demo.dto;
 
+import com.uade.dam.demo.entity.Specialty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,6 +9,6 @@ import lombok.Data;
 public class TopFavoriteDTO {
     private String id;
     private String name;
-    private String specialty;
+    private Specialty specialty;
     private Long favoriteCount;
 }

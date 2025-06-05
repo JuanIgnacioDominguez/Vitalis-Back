@@ -1,6 +1,7 @@
 package com.uade.dam.demo.service;
 
 import com.uade.dam.demo.entity.Professional;
+import com.uade.dam.demo.entity.Specialty;
 import com.uade.dam.demo.entity.TimeSlot;
 import com.uade.dam.demo.repository.ProfessionalRepository;
 import com.uade.dam.demo.repository.TimeSlotRepository;
@@ -34,6 +35,9 @@ public class ProfessionalService {
     }
 
     public Professional save(Professional professional) {
+        if (professional.getSpecialty() == null) {
+            throw new IllegalArgumentException("La especialidad es obligatoria y debe ser válida.");
+        }
         if (professional.getImagen() == null) {
             try {
                 professional.setImagen(Files.readAllBytes(Paths.get("uploads/defaultUser.jpg")));

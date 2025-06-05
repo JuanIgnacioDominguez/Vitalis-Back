@@ -13,7 +13,8 @@ public class Professional {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String name;
-    private String specialty;
+    @Enumerated(EnumType.STRING)
+    private Specialty specialty;
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] imagen;

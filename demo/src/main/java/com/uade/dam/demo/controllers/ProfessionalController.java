@@ -56,7 +56,7 @@ public class ProfessionalController {
                 return new TopFavoriteDTO(
                     prof.getId(),
                     prof.getName(),
-                    prof.getSpecialty(),
+                    prof.getSpecialty(), 
                     fav.getCount()
                 );
             }
@@ -74,7 +74,7 @@ public class ProfessionalController {
                 result.add(new TopFavoriteDTO(
                     p.getId(),
                     p.getName(),
-                    p.getSpecialty(),
+                    p.getSpecialty(), 
                     0L 
                 ));
             }
