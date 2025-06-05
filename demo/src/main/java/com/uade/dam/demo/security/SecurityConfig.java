@@ -28,6 +28,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/professionals/**").permitAll()
+                .requestMatchers("/favorites/**").permitAll()
+                .requestMatchers("/appointments/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
