@@ -1,9 +1,7 @@
 package com.uade.dam.demo.security;
 
-import com.uade.dam.demo.repository.UserRepository;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -11,11 +9,11 @@ import java.io.IOException;
 @Component
 public class JwtFilter implements Filter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private UserRepository usuarioRepository;
+    public JwtFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -25,8 +23,7 @@ public class JwtFilter implements Filter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
             if (jwtUtil.validateToken(jwt)) {
-                String userId = jwtUtil.extractUserId(jwt);
-                // Puedes setear el usuario autenticado en el contexto si lo necesitas
+                // a
             }
         }
         chain.doFilter(request, response);
