@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .requestMatchers("/professionals/**").permitAll()
                 .requestMatchers("/favorites/**").permitAll()
                 .requestMatchers("/appointments/**").permitAll()
+                .requestMatchers("/users/contact").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

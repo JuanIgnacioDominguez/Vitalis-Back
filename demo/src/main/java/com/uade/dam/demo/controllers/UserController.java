@@ -4,6 +4,8 @@ import com.uade.dam.demo.dto.*;
 import com.uade.dam.demo.entity.User;
 import com.uade.dam.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender; 
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,8 +13,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    public UserController(UserService userService) {
+    private final JavaMailSender mailSender; 
+
+    public UserController(UserService userService, JavaMailSender mailSender) { 
         this.userService = userService;
+        this.mailSender = mailSender;
     }
 
     @GetMapping("/{id}")
@@ -62,5 +67,19 @@ public class UserController {
         }
         return ResponseEntity.status(404).body(
                 new ErrorResponseDTO("NOT_FOUND", "User not found"));
+    }
+
+    @PostMapping("/contact")
+    public ResponseEntity<?> contact(@RequestBody ContactRequestDTO req) {
+        try {
+            SimpleMailMessage mail = new SimpleMailMessage();
+            mail.setTo("chatgptlanga@gmail.com"); 
+            mail.setSubject("Nuevo mensaje de Contactanos");
+            mail.setText("Nombre: " + req.getNombre() + "\nEmail: " + req.getEmail() + "\nMensaje:\n" + req.getMensaje());
+            mailSender.send(mail);
+            return ResponseEntity.ok(new GenericSuccessDTO("Mensaje enviado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorResponseDTO("ERROR", "Error enviando mensaje"));
+        }
     }
 }
