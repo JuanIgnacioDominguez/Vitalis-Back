@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/professionals/**").permitAll()
                 .requestMatchers("/favorites/**").permitAll()
                 .requestMatchers("/appointments/**").permitAll()
+                .requestMatchers("/timeslots**").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/users/*/password").authenticated()
                 .anyRequest().authenticated()
             )

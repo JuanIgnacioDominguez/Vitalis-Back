@@ -1,11 +1,12 @@
 package com.uade.dam.demo.controllers;
 
+import com.uade.dam.demo.dto.TimeSlotReserveRequest;
 import com.uade.dam.demo.entity.TimeSlot;
 import com.uade.dam.demo.repository.TimeSlotRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/timeslots")
@@ -17,7 +18,7 @@ public class TimeSlotController {
         this.timeSlotRepository = timeSlotRepository;
     }
 
-    // Listar horarios por profesional y fecha
+    // Listar horarios reservados por profesional y fecha
     @GetMapping
     public List<TimeSlot> getByProfessionalAndDate(
             @RequestParam String professionalId,
@@ -25,31 +26,21 @@ public class TimeSlotController {
         return timeSlotRepository.findByProfessionalIdAndDate(professionalId, date);
     }
 
-    // Reservar un horario (cambiar a RESERVED)
-    @PostMapping("/{id}/reserve")
-    public TimeSlot reserve(@PathVariable String id, @RequestParam String appointmentId) {
-        Optional<TimeSlot> slotOpt = timeSlotRepository.findById(id);
+    // Reservar un horario
+    @PostMapping("/reserve")
+    public ResponseEntity<?> reserveSlot(@RequestBody TimeSlotReserveRequest req) {
+        var slotOpt = timeSlotRepository.findByProfessionalIdAndDateAndTime(
+            req.getProfessionalId(), req.getDate(), req.getTime()
+        );
         if (slotOpt.isPresent()) {
-            TimeSlot slot = slotOpt.get();
-            if (slot.getStatus() == TimeSlot.Status.AVAILABLE) {
-                slot.setStatus(TimeSlot.Status.RESERVED);
-                slot.setAppointmentId(appointmentId);
-                return timeSlotRepository.save(slot);
-            }
+            return ResponseEntity.status(409).body("Horario ya reservado");
         }
-        throw new RuntimeException("No disponible para reservar");
-    }
-
-    // Cancelar un horario (volver a AVAILABLE)
-    @PostMapping("/{id}/cancel")
-    public TimeSlot cancel(@PathVariable String id) {
-        Optional<TimeSlot> slotOpt = timeSlotRepository.findById(id);
-        if (slotOpt.isPresent()) {
-            TimeSlot slot = slotOpt.get();
-            slot.setStatus(TimeSlot.Status.AVAILABLE);
-            slot.setAppointmentId(null);
-            return timeSlotRepository.save(slot);
-        }
-        throw new RuntimeException("No encontrado");
+        TimeSlot slot = TimeSlot.builder()
+            .professionalId(req.getProfessionalId())
+            .date(req.getDate())
+            .time(req.getTime())
+            .appointmentId(req.getUserId())
+            .build();
+        return ResponseEntity.ok(timeSlotRepository.save(slot));
     }
 }

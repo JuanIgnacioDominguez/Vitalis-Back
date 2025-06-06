@@ -17,12 +17,5 @@ public class TimeSlot {
     private String date; 
     private String time; 
 
-    @Enumerated(EnumType.STRING)
-    private Status status; // AVAILABLE, RESERVED
-
-    private String appointmentId; // null si está disponible
-
-    public enum Status {
-        AVAILABLE, RESERVED
-    }
+    private String appointmentId; // usuario que reservó el turno
 }
