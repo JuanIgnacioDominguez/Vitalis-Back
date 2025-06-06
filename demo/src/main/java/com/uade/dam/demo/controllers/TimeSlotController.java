@@ -43,4 +43,10 @@ public class TimeSlotController {
             .build();
         return ResponseEntity.ok(timeSlotRepository.save(slot));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTimeSlot(@PathVariable String id) {
+        timeSlotRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+}
 }
