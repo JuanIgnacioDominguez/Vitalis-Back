@@ -33,6 +33,10 @@ public class SecurityConfig {
                 .requestMatchers("/appointments/**").permitAll()
                 .requestMatchers("/timeslots**").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/users/*/password").authenticated()
+                .requestMatchers(HttpMethod.POST, "/users/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/users/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/users/**").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/users/**").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

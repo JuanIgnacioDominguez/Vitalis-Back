@@ -27,6 +27,12 @@ public class User {
     @Column(nullable = true)
     private String obraSocial;
 
+    @Column(nullable = true)
+    private String nroAfiliado;
+
+    @Column(nullable = true)
+    private String dni;
+
     private LocalDateTime fechaRegistro;
 
     @Lob

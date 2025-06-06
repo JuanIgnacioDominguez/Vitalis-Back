@@ -39,8 +39,11 @@ public class UserController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             user.setNombre(update.getNombre());
-            user.setTelefono(update.getTelefono());
+            user.setEmail(update.getEmail());
+            user.setDni(update.getDni());
             user.setObraSocial(update.getObraSocial());
+            user.setNroAfiliado(update.getNroAfiliado());
+            user.setTelefono(update.getTelefono());
             userService.save(user);
             return ResponseEntity.ok(user);
         }
