@@ -6,6 +6,7 @@ import com.uade.dam.demo.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender; 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,10 +15,12 @@ public class UserController {
 
     private final UserService userService;
     private final JavaMailSender mailSender; 
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, JavaMailSender mailSender) { 
+    public UserController(UserService userService, JavaMailSender mailSender, BCryptPasswordEncoder passwordEncoder) { 
         this.userService = userService;
         this.mailSender = mailSender;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/{id}")
@@ -60,8 +63,11 @@ public class UserController {
         var userOpt = userService.findById(id);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            // TODO: Validar la contraseña actual con BCrypt
-            user.setPassword(req.getNueva());
+            boolean passwordMatch = passwordEncoder.matches(req.getActual(), user.getPassword());
+            if (!passwordMatch) {
+                return ResponseEntity.status(401).body(new ErrorResponseDTO("INVALID_PASSWORD", "La contraseña actual es incorrecta"));
+            }
+            user.setPassword(passwordEncoder.encode(req.getNueva()));
             userService.save(user);
             return ResponseEntity.ok(new GenericSuccessDTO("Password updated"));
         }

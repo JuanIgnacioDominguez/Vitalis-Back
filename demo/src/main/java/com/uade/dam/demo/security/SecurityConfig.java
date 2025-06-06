@@ -2,6 +2,7 @@ package com.uade.dam.demo.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,7 +31,7 @@ public class SecurityConfig {
                 .requestMatchers("/professionals/**").permitAll()
                 .requestMatchers("/favorites/**").permitAll()
                 .requestMatchers("/appointments/**").permitAll()
-                .requestMatchers("/users/contact").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/users/*/password").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
