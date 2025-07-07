@@ -22,6 +22,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.InputStream;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
@@ -54,12 +58,27 @@ public class AuthController {
                     "mensaje", "Email ya registrado"
                 ));
             }
+            
+            byte[] defaultImage = null;
+            try {
+                InputStream imageStream = getClass().getClassLoader().getResourceAsStream("uploads/defaultUser.jpg");
+                if (imageStream != null) {
+                    defaultImage = imageStream.readAllBytes();
+                    imageStream.close();
+                } else {
+                    logger.warn("No se encontró la imagen por defecto en uploads/defaultUser.jpg");
+                }
+            } catch (Exception e) {
+                logger.warn("No se pudo cargar la imagen por defecto: {}", e.getMessage());
+            }
+            
             User usuario = User.builder()
                     .email(req.getEmail())
                     .nombre(req.getNombre())
                     .telefono(req.getTelefono())
                     .password(passwordEncoder.encode(req.getPassword()))
                     .fechaRegistro(LocalDateTime.now())
+                    .imagen(defaultImage)  
                     .build();
             usuarioRepository.save(usuario);
             String token = jwtUtil.generateToken(usuario.getId());
