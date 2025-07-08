@@ -44,8 +44,9 @@ public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
-    // Guardar códigos en memoria (email -> código)
     private Map<String, String> resetCodes = new ConcurrentHashMap<>();
+
+    private Map<String, String> verificationCodes = new ConcurrentHashMap<>();
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AuthRequestDTO req) {
@@ -56,6 +57,14 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(Map.of(
                     "codigo", "EMAIL_EXISTS",
                     "mensaje", "Email ya registrado"
+                ));
+            }
+
+            String savedCode = verificationCodes.get(req.getEmail());
+            if (savedCode == null || !savedCode.equals(req.getCodigoVerificacion())) {
+                return ResponseEntity.status(400).body(Map.of(
+                    "codigo", "INVALID_CODE",
+                    "mensaje", "Código de verificación incorrecto o no solicitado"
                 ));
             }
             
@@ -81,6 +90,9 @@ public class AuthController {
                     .imagen(defaultImage)  
                     .build();
             usuarioRepository.save(usuario);
+
+            verificationCodes.remove(req.getEmail());
+
             String token = jwtUtil.generateToken(usuario.getId());
             logger.info("Usuario registrado correctamente: {}", usuario.getEmail());
             return ResponseEntity.status(201).body(Map.of(
@@ -172,6 +184,37 @@ public class AuthController {
         resetCodes.remove(email);
 
         return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
+    }
+
+    @PostMapping("/request-verification-code")
+    public ResponseEntity<?> requestVerificationCode(@RequestBody Map<String, String> req) {
+        String email = req.get("email");
+        logger.info("Solicitud de código de verificación para: {}", email);
+
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            logger.warn("El email ya está registrado: {}", email);
+            return ResponseEntity.badRequest().body(Map.of(
+                "codigo", "EMAIL_EXISTS",
+                "mensaje", "Email ya registrado"
+            ));
+        }
+
+        String code = String.format("%06d", new Random().nextInt(999999));
+        verificationCodes.put(email, code);
+        logger.info("Código de verificación generado para {}: {}", email, code);
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Código de verificación - Vitalis");
+            message.setText("Tu código de verificación para registrarte en Vitalis es: " + code);
+            mailSender.send(message);
+            logger.info("Correo de verificación enviado a {}", email);
+            return ResponseEntity.ok(Map.of("mensaje", "Código de verificación enviado"));
+        } catch (Exception e) {
+            logger.error("Error enviando correo a {}: {}", email, e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("mensaje", "Error enviando correo"));
+        }
     }
 
     @Data
