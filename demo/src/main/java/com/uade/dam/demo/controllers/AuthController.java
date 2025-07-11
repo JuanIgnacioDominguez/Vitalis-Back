@@ -217,6 +217,25 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/check-email")
+    public ResponseEntity<?> checkEmail(@RequestBody Map<String, String> req) {
+        String email = req.get("email");
+        logger.info("Verificando disponibilidad del email: {}", email);
+        
+        if (usuarioRepository.findByEmail(email).isPresent()) {
+            return ResponseEntity.status(409).body(Map.of(
+                "available", false,
+                "codigo", "EMAIL_EXISTS",
+                "mensaje", "Email ya registrado"
+            ));
+        }
+        
+        return ResponseEntity.ok(Map.of(
+            "available", true,
+            "mensaje", "Email disponible"
+        ));
+    }
+
     @Data
     public static class AuthRequest {
         private String email;
