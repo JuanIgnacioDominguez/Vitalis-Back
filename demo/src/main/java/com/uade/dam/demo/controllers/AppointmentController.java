@@ -51,4 +51,17 @@ public class AppointmentController {
         List<Appointment> userAppointments = appointmentService.findByUserId(userId);
         return ResponseEntity.ok(userAppointments);
     }
+
+    @PutMapping("/user/{userId}/update-expired")
+    public ResponseEntity<List<Appointment>> updateExpiredAppointments(@PathVariable String userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUserId = authentication.getName();
+        
+        if (!userId.equals(authenticatedUserId)) {
+            return ResponseEntity.status(403).build(); 
+        }
+        
+        List<Appointment> updatedAppointments = appointmentService.updateExpiredAppointmentsForUser(userId);
+        return ResponseEntity.ok(updatedAppointments);
+    }
 }
