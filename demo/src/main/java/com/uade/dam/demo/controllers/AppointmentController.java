@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/appointments")
@@ -53,7 +54,10 @@ public class AppointmentController {
     }
 
     @PutMapping("/user/{userId}/update-expired")
-    public ResponseEntity<List<Appointment>> updateExpiredAppointments(@PathVariable String userId) {
+    public ResponseEntity<List<Appointment>> updateExpiredAppointments(
+        @PathVariable String userId, 
+        @RequestBody Map<String, String> req) {
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedUserId = authentication.getName();
         
@@ -61,7 +65,11 @@ public class AppointmentController {
             return ResponseEntity.status(403).build(); 
         }
         
-        List<Appointment> updatedAppointments = appointmentService.updateExpiredAppointmentsForUser(userId);
+        String currentDate = req.get("currentDate"); 
+        String currentTime = req.get("currentTime"); 
+        
+        List<Appointment> updatedAppointments = appointmentService.updateExpiredAppointmentsForUser(userId, currentDate, currentTime);
+        
         return ResponseEntity.ok(updatedAppointments);
     }
 }

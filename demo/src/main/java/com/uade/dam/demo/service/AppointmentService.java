@@ -38,30 +38,32 @@ public class AppointmentService {
         return appointmentRepository.findByUserId(userId);
     }
 
-    public List<Appointment> updateExpiredAppointmentsForUser(String userId) {
+    public List<Appointment> updateExpiredAppointmentsForUser(String userId, String currentDate, String currentTime) {
         List<Appointment> userAppointments = appointmentRepository.findByUserId(userId);
-        LocalDate today = LocalDate.now();
-        LocalTime now = LocalTime.now();
+        LocalDate today = LocalDate.parse(currentDate);
+        LocalTime now = LocalTime.parse(currentTime);
+        
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
+        
         for (Appointment appointment : userAppointments) {
             if ("pending".equals(appointment.getStatus())) {
                 try {
                     LocalDate appointmentDate = LocalDate.parse(appointment.getDate(), dateFormatter);
                     LocalTime appointmentTime = LocalTime.parse(appointment.getTime(), timeFormatter);
-
-                    if (appointmentDate.isBefore(today) ||
-                            (appointmentDate.equals(today) && appointmentTime.isBefore(now))) {
+                    
+                    boolean isExpired = appointmentDate.isBefore(today) || 
+                        (appointmentDate.equals(today) && appointmentTime.isBefore(now));
+                    
+                    if (isExpired) {
                         appointment.setStatus("completed");
                         appointmentRepository.save(appointment);
                     }
                 } catch (Exception e) {
-                    System.err.println("Error parseando fecha/hora para appointment " + appointment.getId());
                 }
             }
         }
-
-        return userAppointments;
+        
+        return appointmentRepository.findByUserId(userId);
     }
 }
