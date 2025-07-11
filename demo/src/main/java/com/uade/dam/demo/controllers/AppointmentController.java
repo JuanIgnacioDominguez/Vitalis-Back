@@ -2,6 +2,9 @@ package com.uade.dam.demo.controllers;
 
 import com.uade.dam.demo.entity.Appointment;
 import com.uade.dam.demo.service.AppointmentService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,5 +37,18 @@ public class AppointmentController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         appointmentService.deleteById(id);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Appointment>> getUserAppointments(@PathVariable String userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUserId = authentication.getName();
+        
+        if (!userId.equals(authenticatedUserId)) {
+            return ResponseEntity.status(403).build(); 
+        }
+        
+        List<Appointment> userAppointments = appointmentService.findByUserId(userId);
+        return ResponseEntity.ok(userAppointments);
     }
 }

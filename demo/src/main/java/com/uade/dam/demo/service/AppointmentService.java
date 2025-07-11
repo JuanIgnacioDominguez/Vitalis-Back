@@ -30,4 +30,8 @@ public class AppointmentService {
     public void deleteById(String id) {
         appointmentRepository.deleteById(id);
     }
+
+    public List<Appointment> findByUserId(String userId) {
+        return appointmentRepository.findByUserId(userId);
+    }
 }

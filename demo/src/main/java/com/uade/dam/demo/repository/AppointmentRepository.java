@@ -6,5 +6,4 @@ import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, String> {
     List<Appointment> findByUserId(String userId);
-    List<Appointment> findByUserIdAndStatus(String userId, String status);
 }
