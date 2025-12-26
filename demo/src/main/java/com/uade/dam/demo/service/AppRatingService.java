@@ -1,6 +1,7 @@
 package com.uade.dam.demo.service;
 
 import com.uade.dam.demo.entity.AppRating;
+import com.uade.dam.demo.entity.User;
 import com.uade.dam.demo.repository.AppRatingRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +30,13 @@ public class AppRatingService {
 
     public void deleteById(String id) {
         appRatingRepository.deleteById(id);
+    }
+
+    public Optional<AppRating> findByUser(User user) {
+        return appRatingRepository.findByUser(user);
+    }
+
+    public boolean hasUserRated(User user) {
+        return appRatingRepository.existsByUser(user);
     }
 }
