@@ -3,6 +3,9 @@ package com.uade.dam.demo.controllers;
 import com.uade.dam.demo.dto.*;
 import com.uade.dam.demo.entity.User;
 import com.uade.dam.demo.service.UserService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender; 
@@ -10,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 import java.util.Random;
@@ -139,5 +143,66 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body(new ErrorResponseDTO("ERROR", "Error enviando código"));
         }
+    }
+
+    @PutMapping("/{id}/profile-picture")
+    public ResponseEntity<?> updateProfilePicture(@PathVariable String id, @RequestParam("file") MultipartFile file) {
+        try {
+            var userOpt = userService.findById(id);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(404).body(new ErrorResponseDTO("NOT_FOUND", "User not found"));
+            }
+
+            User user = userOpt.get();
+            
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return ResponseEntity.status(400).body(new ErrorResponseDTO("INVALID_FILE", "El archivo debe ser una imagen"));
+            }
+
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return ResponseEntity.status(400).body(new ErrorResponseDTO("FILE_TOO_LARGE", "La imagen no puede superar los 5MB"));
+            }
+
+            user.setImagen(file.getBytes());
+            userService.save(user);
+            
+            return ResponseEntity.ok(new GenericSuccessDTO("Foto de perfil actualizada"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new ErrorResponseDTO("ERROR", "Error actualizando foto de perfil: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/profile-picture")
+    public ResponseEntity<?> getProfilePicture(@PathVariable String id) {
+        var userOpt = userService.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(new ErrorResponseDTO("NOT_FOUND", "User not found"));
+        }
+
+        User user = userOpt.get();
+        if (user.getImagen() == null || user.getImagen().length == 0) {
+            return ResponseEntity.status(404).body(new ErrorResponseDTO("NOT_FOUND", "No profile picture found"));
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG); 
+        headers.setContentLength(user.getImagen().length);
+        
+        return new ResponseEntity<>(user.getImagen(), headers, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}/profile-picture")
+    public ResponseEntity<?> deleteProfilePicture(@PathVariable String id) {
+        var userOpt = userService.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(new ErrorResponseDTO("NOT_FOUND", "User not found"));
+        }
+
+        User user = userOpt.get();
+        user.setImagen(null);
+        userService.save(user);
+        
+        return ResponseEntity.ok(new GenericSuccessDTO("Foto de perfil eliminada"));
     }
 }
