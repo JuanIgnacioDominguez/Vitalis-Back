@@ -24,6 +24,17 @@ Vitalis digitaliza la gestión de turnos médicos con seguridad y buenas prácti
 
 ---
 
+## 👨‍💻 Desarrolladores
+
+| Desarrollador | Rol |
+|---------------|-----|
+| **Thomas Agustín Giardina** | Fullstack Developer |
+| **Juan Ignacio Domínguez** | Fullstack Developer |
+
+> 🎓 Este proyecto comenzó como un trabajo práctico en la facultad y fue posteriormente mejorado por completo, implementando buenas prácticas, patrones de diseño modernos y una arquitectura escalable.
+
+---
+
 ## 🧭 Índice
 - [Descripción](#-descripción)
 - [Arquitectura](#-arquitectura)
